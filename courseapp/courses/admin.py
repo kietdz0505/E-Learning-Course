@@ -20,7 +20,7 @@ class MyLessonAdmin(admin.ModelAdmin):
     form = LessonForm
     def image_view(self, lesson):
         if lesson:
-            return mark_safe(f"<img src='/static/{lesson.image.name}' width='120px'/>")
+            return mark_safe(f"<img src='{lesson.image.url}' width='120px'/>")
 
 admin.site.register(Category)
 admin.site.register(Course)
