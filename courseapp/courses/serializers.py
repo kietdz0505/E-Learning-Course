@@ -1,4 +1,4 @@
-from courses.models import Category, Course, Lesson,Tag
+from courses.models import Category, Course, Lesson,Tag, Comment, User
 from rest_framework import serializers
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -35,3 +35,31 @@ class LessonDetailsSerializer(LessonSerializer):
     class Meta:
         model = LessonSerializer.Meta.model
         fields = LessonSerializer.Meta.fields + ['content','tags']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name','last_name','username','password','avatar']
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }
+        }
+
+    def create(self, validated_data):
+        data =  validated_data.copy()
+        u = User(**data)
+        u.set_password(u.password)
+        u.save()
+        return u
+
+    def to_representation(self, instance):
+        d = super().to_representation(instance)
+        d['avatar'] = instance.avatar.url
+        return d
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = Comment
+        fields = ['id','content','created_date','update_date','user']
